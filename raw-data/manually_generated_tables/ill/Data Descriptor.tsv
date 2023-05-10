@@ -1,0 +1,60 @@
+Notes (cell highlight)	#purple	No MD5 files
+NA	#tan	The HG002 2x250 fastqs had 2 MD5 files but none of the other folders did
+NA	#cyan	Any idea who did the 10X sequencing?
+NA	#yellow	Readme says 13-17x across all sequenced genomic positions but 400x in physical coverage. Which do you want to use?
+NA	#light red	Readme does not discuss analysis, no coverage listed
+NA	#green	Readme does not specify coverage for these bams
+NA	NA	NA
+Table	column_name	description
+ILL_basecalls	seq_run_id	# primary key for this sequencing run
+ILL_basecalls	giab_id	GIAB ID for this seq run (matches sample_table)
+ILL_basecalls	trio	see sample_table
+ILL_basecalls	platform	vendor of sequencer
+ILL_basecalls	instrument	model of sequencer
+ILL_basecalls	library_strategy	NA
+ILL_basecalls	library_source	NA
+ILL_basecalls	library_selection	NA
+ILL_basecalls	library_layout	NA
+ILL_basecalls	center_name	name of group conducting the sequencing run
+ILL_basecalls	ftp_readme_url	link to the readme
+ILL_basecalls	ftp_dir	link to directory on FTP site holding the FASTQ files (if applicable)
+ILL_basecalls	ftp_file_list	NA
+ILL_basecalls	ftp_md5_file	NA
+ILL_basecalls	ftp_md5_file	NA
+ILL_basecalls	sra_sample	NA
+ILL_basecalls	sra_study	NA
+ILL_basecalls	sra_ids	identifier(s) for these reads in the NCBI Sequence Read Archive (SRA)
+ILL_basecalls	other_seq_data	NA
+ILL_basecalls	bioproject_id	identifier for these reads in NCBI BioProject database
+ILL_basecalls	notes	NA
+NA	NA	NA
+ILL_allignments	bam_id	# primary key
+ILL_allignments	giab_id	GIAB ID for this seq run (matches sample_table)
+ILL_allignments	trio	see sample_table
+ILL_allignments	description	short description of the alignments (platform, machine, lib prep, date)
+ILL_allignments	coverage	NA
+ILL_allignments	input_fqs	corresponding ID for the reads used in these alighnments (see PacBioCCS_reads)
+ILL_allignments	aligner	program used to align the reads
+ILL_allignments	ref_genome	ref genome used in the alignment
+ILL_allignments	ftp_readme_url	link to the readme
+ILL_allignments	ftp_dir	link to directory on FTP site holding the FASTQ files (if applicable)
+ILL_allignments	ftp_bam_file	link to bam file on FTP site
+ILL_allignments	ftp_bai_file	link to indexed bam file on FTP site
+ILL_allignments	ftp_md5_list_file	NA
+ILL_allignments	sra_ids	identifier of the bam file in the NCBI Sequence Read Archive (SRA)
+ILL_allignments	bioproject_id	identifier of the bam file in the NCBI BioProject database
+ILL_allignments	other_seq_data	(samtools_stats output)
+ILL_allignments	notes	NA
+ILL_allignments	md5key	column with md5 for filepath, for linking with automatically generated metadata tables from AWS work
+NA	NA	NA
+ILL_variants	vcf_id	# primary key
+ILL_variants	input_bam	ID if the input bam file (see PacBioCCS_alighnments)
+ILL_variants	giab_id	ID of the input sample used to generate the reads (see sample_table)
+ILL_variants	variant_caller	program used to call variants
+ILL_variants	ref_genome	inpute reference sequence for the variant caller
+ILL_variants	aligner	NA
+ILL_variants	readme_url	link to the readme
+ILL_variants	ftp_dir	link to directory on FTP site containing alighments
+ILL_variants	ftp_file_list	NA
+ILL_variants	md5_list	NA
+ILL_variants	notes	NA

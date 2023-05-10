@@ -1,0 +1,40 @@
+Notes (cell highlight)	#tan	says phased in readme but no vcf in bam headers
+NA	NA	NA
+Table	column_name	description
+ONT_basecalls	seq_run_id	# primary key for this sequencing run
+ONT_basecalls	giab_id	GIAB ID for this seq run (matches sample_table)
+ONT_basecalls	trio	see sample_table
+ONT_basecalls	input_fast5s	NA
+ONT_basecalls	config	NA
+ONT_basecalls	base_caller	NA
+ONT_basecalls	center_name	name of group conducting the sequencing run
+ONT_basecalls	ftp_readme_url	link to the readme
+ONT_basecalls	ftp_dir	link to directory on FTP site holding the FASTQ files (if applicable)
+ONT_basecalls	ftp_file_list	NA
+ONT_basecalls	md5_list	NA
+ONT_basecalls	sra_ids	identifier(s) for these reads in the NCBI Sequence Read Archive (SRA)
+ONT_basecalls	other_seq_data	NA
+ONT_basecalls	bioproject_id	identifier for these reads in NCBI BioProject database
+ONT_basecalls	notes	NA
+ONT_basecalls	md5key	column with md5 for filepath, for linking with automatically generated metadata tables from AWS work
+NA	NA	NA
+ONT_alignments	bam_id	# primary key
+ONT_alignments	giab_id	GIAB ID for this seq run (matches sample_table)
+ONT_alignments	trio	see sample_table
+ONT_alignments	description	short description of the alignments (platform, machine, lib prep, date)
+ONT_alignments	coverage	NA
+ONT_alignments	input_fqs	corresponding ID for the reads used in these alighnments (see PacBioCCS_reads)
+ONT_alignments	aligner	program used to align the reads
+ONT_alignments	ref_genome	ref genome used in the alignment
+ONT_alignments	ftp_readme_url	link to the readme
+ONT_alignments	phased	NA
+ONT_alignments	ftp_input_vcf	NA
+ONT_alignments	ftp_dir	link to directory on FTP site holding the FASTQ files (if applicable)
+ONT_alignments	ftp_bam_file	link to bam file on FTP site
+ONT_alignments	ftp_bai_file	link to indexed bam file on FTP site
+ONT_alignments	ftp_md5_list_file	NA
+ONT_alignments	sra_ids	identifier of the bam file in the NCBI Sequence Read Archive (SRA)
+ONT_alignments	bioproject_id	identifier of the bam file in the NCBI BioProject database
+ONT_alignments	other_seq_data	(samtools_stats output)
+ONT_alignments	notes	NA
+ONT_alignments	md5key	column with md5 for filepath, for linking with automatically generated metadata tables from AWS work

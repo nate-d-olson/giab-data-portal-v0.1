@@ -1,0 +1,73 @@
+---
+title: "Downloading Manually Generated Tables"
+format: html
+editor: visual
+---
+
+```{r}
+library(googlesheets4)
+library(googledrive)
+library(tidyverse)
+library(here)
+library(fs)
+```
+
+
+Used chatGPT to generate a basic script to download all sheets from defined google sheets
+```{r}
+## Google sheet IDs from urls
+manually_generate_gs <- list(
+    pacbioccs = "1OzrjSl1FTb-lFKXTczZv_AfsTRB8G-_3TigSTwmSZeE",
+    ill = "15NfcX6cjnfxxlEthzLemvv-p-sSvj-cbpvZDB-FII4g",
+    ont = "1G0xCweSj9_Hvn5H4GDdUBFoJwdlR4fV6CCYRabTmPAU"
+)
+
+```
+
+```{r}
+get_sheets_from_gs <- function(google_sheet_id){
+    # Google Sheet URL or ID
+    
+    # Get the Google Sheet metadata (including sheet names)
+    sheet_metadata <- googlesheets4::gs4_get(google_sheet_id)
+    sheet_titles <- sheet_metadata$sheets$name
+    
+    # Download each sheet and store it in a list
+    all_sheets <- lapply(sheet_titles, function(sheet_name) {
+      sheet_data <- googlesheets4::read_sheet(google_sheet_id, sheet_name)
+      return(sheet_data)
+    })
+    
+    # Assign names to the list elements based on sheet names
+    names(all_sheets) <- sheet_titles
+    
+    ## retrieving tables
+    sheets_as_tbls <- sheet_titles %>% 
+        set_names(sheet_titles) %>% 
+        map(~all_sheets[[.x]]) 
+    
+    return(sheets_as_tbls)
+}
+
+write_gs_sheets <- function(sheets, outdir){
+    outdir <- here("raw-data/manually_generated_tables",outdir)
+    fs::dir_create(outdir)
+    sheet_paths <- glue::glue("{names(sheets)}.tsv") %>% 
+        fs::path(here(outdir), .)
+    map2(sheets, sheet_paths, write_tsv)
+}
+
+```
+
+Authenticate access to google drive only need to do once
+```{r}
+## drive_auth()
+```
+
+```{r}
+gs_sheets <- manually_generate_gs %>% 
+    map(get_sheets_from_gs)
+
+map2(gs_sheets, names(gs_sheets), write_gs_sheets)
+```
+

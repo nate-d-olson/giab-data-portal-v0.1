@@ -1,0 +1,73 @@
+Notes (highlighted cells)	...2	...3
+#yellow	no md5 file	NA
+#light bue	need to verify	NA
+#orange	no README	NA
+#grey	no vcf file name or path in README	NA
+#mauve	multiple md5 files (one for each fastq) --- wait until we automate the listing of fastqs to list the md5 files here	NA
+#bright pink	not in SRA yet	NA
+#light pink	not sure of coverage - not in file name or README	NA
+#green	bams merged and marked for removal from the FTP site - NOT noted in README yet	NA
+# NOTES: if merged bam used, only merged bam listed here - individual bam files may be in FTP dir but are not linked here, *duplomap remapped reads are not phased	NA	NA
+NA	NA	NA
+Table	column_name	description
+PacBioCCS_basecalls	seq_run_id	# primary key for this sequencing run
+PacBioCCS_basecalls	giab_id	GIAB ID for this seq run (matches sample_table)
+PacBioCCS_basecalls	trio	see sample_table
+PacBioCCS_basecalls	source	identifier of sequence used to create the reads (NIST RM number, Coriell cell/DNA ID, etc)
+PacBioCCS_basecalls	platform	vendor of sequencer
+PacBioCCS_basecalls	instrument	model of sequencer
+PacBioCCS_basecalls	chemistry	chemistry vision used in the sequencer
+PacBioCCS_basecalls	library_prep	size(s) or coverage of the library used
+PacBioCCS_basecalls	center_name	name of group conducting the sequencing run
+PacBioCCS_basecalls	ftp_readme_url	link to readme on FTP site (if available)
+PacBioCCS_basecalls	ftp_dir	link to directory on FTP site holding the FASTQ files (if applicable)
+PacBioCCS_basecalls	ftp_file_list	NA
+PacBioCCS_basecalls	ftp_md5_file	link to file on FTP site with md5/fastq pairs (if applicable)
+PacBioCCS_basecalls	ftp_md5_List	NA
+PacBioCCS_basecalls	external_directory	link to non-FTP directory holding fastq files (if applicable)
+PacBioCCS_basecalls	external_file_link	NA
+PacBioCCS_basecalls	external_md5_link	NA
+PacBioCCS_basecalls	external_readme	link to readme on non-FTP site (iif applicable)
+PacBioCCS_basecalls	parent_data	NA
+PacBioCCS_basecalls	sra_ids	identifier(s) for these reads in the NCBI Sequence Read Archive (SRA)
+PacBioCCS_basecalls	other_seq_data	NA
+PacBioCCS_basecalls	bioproject_id	identifier for these reads in NCBI BioProject database
+NA	NA	NA
+PacBioCCS_alignments	bam_id	# primary key
+PacBioCCS_alignments	giab_id	corresponding sample ID (see sample_table)
+PacBioCCS_alignments	trio	see sample_table
+PacBioCCS_alignments	description	short description of the alignments (platform, machine, lib prep, date)
+PacBioCCS_alignments	coverage	NA
+PacBioCCS_alignments	input_fqs	corresponding ID for the reads used in these alighnments (see PacBioCCS_reads)
+PacBioCCS_alignments	aligner	program used to align the reads
+PacBioCCS_alignments	ref_genome	ref genome used in the alignment
+PacBioCCS_alignments	phased	NA
+PacBioCCS_alignments	ftp_dir	link to directory on FTP site containing alighments
+PacBioCCS_alignments	ftp_readme_url	link to readme on FTP site
+PacBioCCS_alignments	ftp_input_vcf	NA
+PacBioCCS_alignments	ftp_bam_file	link to bam file on FTP site
+PacBioCCS_alignments	ftp_bai_file	link to indexed bam file on FTP site
+PacBioCCS_alignments	ftp_md5_list_file	link to md5/file pairs on FTP site for each file in FTP_dir (I think) (If applicable)
+PacBioCCS_alignments	ftp_bam_md5	link to md5 file of bam file (if applicable)
+PacBioCCS_alignments	ftp_bai_md5	link to md5 file of bam index file (if applicable)
+PacBioCCS_alignments	external_directory	like FTP_Dir except for non-FTP site links
+PacBioCCS_alignments	external_file_link	like FTP_bam_file except for non-FTP site links
+PacBioCCS_alignments	external_md5_link	like FTP_bam_md5 except for non-FTP site links
+PacBioCCS_alignments	external_readme	like FTP_readme_url except for non-FTP site links
+PacBioCCS_alignments	sra_ids	identifier of the bam file in the NCBI Sequence Read Archive (SRA)
+PacBioCCS_alignments	bioproject_id	identifier of the bam file in the NCBI BioProject database
+PacBioCCS_alignments	md5key	column with md5 for filepath, for linking with automatically generated metadata tables from AWS work
+NA	NA	NA
+PacBioCCS_variants	vcf_id	# primary key
+PacBioCCS_variants	input_bam	ID if the input bam file (see PacBioCCS_alighnments)
+PacBioCCS_variants	giab_id	ID of the input sample used to generate the reads (see sample_table)
+PacBioCCS_variants	variant_caller	program used to call variants
+PacBioCCS_variants	ref_genome	inpute reference sequence for the variant caller
+PacBioCCS_variants	aligner	NA
+PacBioCCS_variants	readme_url	link to the readme
+PacBioCCS_variants	ftp_dir	link to directory on FTP site containing alighments
+PacBioCCS_variants	ftp_vcf_file	link to the vcf file
+PacBioCCS_variants	ftp_vcf_indx_file	link to the indexed vcf file
+PacBioCCS_variants	md5_in	md5 file with md5 values for all files in directory
+PacBioCCS_variants	notes	NA
+PacBioCCS_variants	md5key	column with md5 for filepath, for linking with automatically generated metadata tables from AWS work
