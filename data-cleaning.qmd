@@ -206,7 +206,7 @@ vcf_metadata2 <- vcf_metadata %>%
 ```
 
 ```{r}
-write_csv(vcf_metadata2, "metadata_tables/cxf_metadata.csv")
+write_csv(vcf_metadata2, "metadata_tables/vcf_metadata.csv")
 ```
 
 
