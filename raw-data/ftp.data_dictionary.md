@@ -1,5 +1,3 @@
-Sure, here's a data dictionary for the table you provided:
-
 | Column Name | Description |
 | --- | --- |
 | md5key | Unique identifier for the file based on the file name and path, generated using the MD5 hashing algorithm |
