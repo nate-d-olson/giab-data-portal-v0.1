@@ -1,0 +1,30 @@
+---
+title: "Untitled"
+author: "ND Olson"
+date: "2023-05-25"
+output: html_document
+---
+
+```{r}
+library(tidyverse)
+```
+
+```{r}
+ftp_df <- read_csv("raw-data/ftp.csv")
+```
+```{r}
+ftp_urls <- ftp_df %>% 
+    mutate(url = glue::glue("https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/giab/{str_remove(filepath,'/giab/ftp/')}/{filename}")) %>% 
+    filter(filetype == "vcf") %>% 
+    select(url) %>% 
+    {write_lines(.$url, file = "~/Projects/SeqSleuth/etc/full_vcf_list.txt")}
+```
+
+```{r}
+ftp_urls <- ftp_df %>% 
+    mutate(url = glue::glue("https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/giab/{str_remove(filepath,'/giab/ftp/')}/{filename}")) %>% 
+    filter(filetype == "bam") %>% 
+    select(url) %>% 
+    {write_lines(.$url, file = "~/Projects/SeqSleuth/etc/full_bam_list.txt")}
+```
+

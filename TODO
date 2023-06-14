@@ -1,0 +1,5 @@
+-[ ] list file and sources for raw-data tables
+-[ ] create data dictionaries for tables in metadata_table
+-[ ] update README in metadata_tables with information on how the individual tables were generated
+-[ ] create data dictionaries for tables in raw-data
+-[ ] update README for raw-data providing information on when and how the individual tables were generated
