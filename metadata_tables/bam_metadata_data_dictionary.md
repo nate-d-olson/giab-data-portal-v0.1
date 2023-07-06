@@ -1,18 +1,18 @@
 | Field                | Data Type     | Description                                                                                    |
 |----------------------|---------------|------------------------------------------------------------------------------------------------|
-| filepath             | String        | The path of the directory where the file is stored                                                |
+| filepath             | String        | The path of the file location on the system|
 | bam                  | String        | The BAM file name                                                                              |
-| indexfile            | String        | The name of the index file for the corresponding BAM file                                                      |
+| indexfile            | String        | The name of the index file for the corresponding BAM file|
 | filesize_in_Gb       | Float         | The size of the file in gigabytes (Gb)                                                        |
 | readme               | String        | The path of the readme file for the corresponding BAM file                             |
-| giab_id_cdk          | String        | The GIAB ID or identifier for the CDK                                                         |
+| giab_id         | String        | The GIAB ID for the sample|
 | biosample            | String        | The BioSample ID for the sample                                                                       |
-| trio_cdk             | String        | The identifier for the trio CDK                                                                |
-| dna_id               | String        | The ID of the DNA sample                                                                            |
+| trio          | String        | The relationship of the sample to the Ashkenazi trio|
+| dna_id               | String        | The ID of the DNA sample|
 | sort_order           | String        | The sort order used for the BAM file                                                                    |
 | aligner_cmd          | String        | The command used for alignment                                                                 |
-| reference_genome     | String        | The reference genome used for alignment                                                        |
-| notes_cdk            | String        | Additional notes or comments about the CDK                                                     |
+| reference_genome     | String        | The name of the reference genome used for the BAM file|
+| notes           | String        | 	Any additional notes about the metadata provided for this file|
 | stats                | String        | Statistics information                                                                         |
 | ftp_bam_file         | String        | The FTP URL for the BAM file                                                                   |
 | tech                 | String        | The technology used for sequencing                                                             |
@@ -23,7 +23,6 @@
 | coverage             | String        | Information about coverage                                                                     |
 | input_fqs            | String        | Input fastq files                                                                              |
 | aligner              | String        | command used to align reads to the reference extracted from the bam header                                                               |
-| ref_genome           | String        | The name of the reference genome used for the BAM file                                                        |
 | ftp_readme_url       | String        | The FTP URL for the readme file                                                                |
 | ftp_dir              | String        | The FTP directory or location                                                                  |
 | ftp_bai_file         | String        | The FTP URL for the corresponding BAI file                                                     |
@@ -31,7 +30,6 @@
 | sra_ids              | String        | The SRA IDs or identifiers                                                                     |
 | bioproject_id        | String        | The BioProject ID or identifier                                                                |
 | other_seq_data       | String        | Information about other sequencing data                                                        |
-| notes                | String        | Additional notes or comments                                                                   |
 | phased               | String        | Phased information                                                                             |
 | ftp_input_vcf        | String        | The FTP URL for the input VCF file                                                             |
 | ftp_bam_md5          | String        | The FTP URL for the BAM file MD5 checksum                                                      |
