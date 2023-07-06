@@ -5,9 +5,7 @@
 | indexfile            | String        | The name of the index file for the corresponding BAM file|
 | filesize_in_Gb       | Float         | The size of the file in gigabytes (Gb)                                                        |
 | readme               | String        | The path of the readme file for the corresponding BAM file                             |
-| giab_id         | String        | The GIAB ID for the sample|
 | biosample            | String        | The BioSample ID for the sample                                                                       |
-| trio          | String        | The relationship of the sample to the Ashkenazi trio|
 | dna_id               | String        | The ID of the DNA sample|
 | sort_order           | String        | The sort order used for the BAM file                                                                    |
 | aligner_cmd          | String        | The command used for alignment                                                                 |
