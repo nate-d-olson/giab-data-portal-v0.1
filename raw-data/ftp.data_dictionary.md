@@ -10,7 +10,7 @@
 | giab_id | Identifier for the Genome in a Bottle (GIAB) dataset |
 | biosample | SRA BioSample accession number |
 | trio | Identifier for the GIAB trio the sample belongs: NA12878 (note not a trio) AshkenazimTrio or ChineseTrio |
-| dna_id | sample identifier for the batch of DNA sequenced |
+| dna_id | Sample identifier for the batch of DNA sequenced |
 | notes | Any additional notes or comments about the file |
 | year | Year in which the metadata was generated |
 | month | Month in which the file was generated |
