@@ -1,0 +1,53 @@
+---
+title: "shrinking-metadata-tables"
+format: html
+---
+
+```{r}
+library(tidyverse)
+library(here)
+```
+
+```{r}
+bam_dat <- read_csv("metadata_tables/bam_metadata.csv")
+```
+
+```{r}
+glimpse(bam_dat)
+```
+
+```{r}
+bam_dat %>% select(giab_id_cdk, trio_cdk, dna_id, biosample, reference_genome, filesize_in_Gb, ftp_bam_file, filepath, bam, indexfile) %>% 
+    filter(str_detect(ftp_bam_file, "Moleculo", negate = TRUE)) %>%
+    # sample_n(size = 2750) %>%
+    write_csv(
+    "metadata_tables/bam_metadata_smaller.csv", na = ""
+)
+```
+
+
+```{r}
+fq_dat <- read_tsv("metadata_tables/fastq_metadata.tsv")
+```
+```{r}
+glimpse(fq_dat)
+```
+
+```{r}
+fq_dat %>% filter(str_detect(url, "Homogeneity|HiSeq", negate = TRUE)) %>%
+    select(giab_id, trio, dna_id, total_sequences, mode_length, url) %>%
+    write_csv("metadata_tables/fastq_metadata_smaller.csv")
+    # glimpse()
+```
+
+```{r}
+vcf_dat <- read_csv("metadata_tables/vcf_metadata.csv")
+glimpse(vcf_dat)
+```
+
+```{r}
+vcf_dat %>% 
+    select(giab_id_cdk, biosample, trio, dna_id, ref_genome, snps, indels, phased_genotypes, ftp_vcf_file) %>%
+    write_csv("metadata_tables/vcf_metadata_smaller.csv")
+```
+
