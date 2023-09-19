@@ -1,2 +1,3 @@
 ## Metadata Tables
-The metadata tables in this directory were generated using `notebooks/data-cleaning.qmd` and contain key metadata collected using multiple methods.
+
+`bam_metadata.csv` - generated using `notebooks/v0.1.2-bam-metadata-registry.qmd`, the output file was then manually edited as noted in the notebook.

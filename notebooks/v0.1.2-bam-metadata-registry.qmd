@@ -1,0 +1,386 @@
+---
+title: "BBD Human Genomics Analysis Template"
+date: '`r Sys.Date()`'
+author: "Add your name here"
+format: html
+editor: visual
+---
+
+```{r setup}
+#| include=FALSE,
+#| echo=TRUE
+library(tidyverse)
+library(here)
+library(jsonlite)
+library(data.table)
+```
+
+# Summary
+
+Generating new version of the metadata table for the giab data registry. This bam metadata table will focus on priority datasets, manually excluding subsets of larger datasets and bam files generated using multiple mapping methods.
+
+# Background
+
+Current versions of the metadata tables are not particularly useful as they are missing relevant information and relatively sparse. This version will focus on high priority datasets that I expect are of use and interest to the community along with using the output of SeqSleuth to add some of the missing key metadata. Additional manual curration and annotation maybe used to improve the value and usability of the metadata table.
+
+## Context
+
+This metadata table represent an intermediate step in the development of a GIAB data portal.
+
+## Objective
+
+Generation of a complete and useable metadata table for bam files on the ftp site.
+
+## Approach
+
+1.  Generate list of bam files from ftp metadata table generated using the AWS CDK kit.
+2.  Filter full list of bams to get a list of high priority bams that are likely most useful to the community.
+3.  Manually add missing information to the metadata table.
+4.  Annotate curated bam metadata table with metadata collected using SeqSleuth
+5.  Look to see if there is additional metadata from the AWS CDK
+
+# Analyses
+
+### Loading ftp metadata table from AWS CDK
+
+`giab_ftp_all_metadata.csv` metadata table for ftp site, obtained from s3 bucket, `s3://dev-giab-metadata-752334989853/raw/ftp/year=2023/month=5/giab_ftp_all_metadata.csv`, 
+  - MD5: `b0a67a70b809df539992c75c9d4eab71`
+
+```{r}
+ftp_metadata <- read_csv(here("raw-data/giab_ftp_all_metadata.csv"))
+glimpse(ftp_metadata)
+
+```
+
+Number of bam files on the ftp site. A number of these are for old technologies, redundant relative to other bam files, or were generated for specific analyses and not of interest to most users.
+
+```{r}
+ftp_metadata %>% filter(filetype == "bam") %>% nrow()
+```
+
+### Generating List of High Priority Bam Files
+
+```{r}
+priority_bams <- ftp_metadata %>%
+    filter(
+        filetype == "bam",
+        ## Excluding bams from older technologies
+        str_detect(filepath, "Moleculo", negate = TRUE),
+        str_detect(filepath, "CompleteGenomics", negate = TRUE),
+        str_detect(filepath, "exome|Exome", negate = TRUE),
+        str_detect(filepath, "SOLiD|SOLID", negate = TRUE),
+        str_detect(filepath, "stLFR", negate = TRUE),
+        ## Excluding bams from analyses that were part of the HG002 v0.6 SV benchmark set
+        str_detect(filepath, "Broad_svaba", negate = TRUE),
+        str_detect(filepath, "DNAnexus_AndrewC_Illumina_Callers", negate = TRUE),
+        str_detect(filepath, "DNANEXUS_Parliament_SVs_11062015", negate = TRUE),
+        str_detect(filepath, "Dovetail_HiRiseScaffolding", negate = TRUE),
+        ## Excluding assembly-assembly alignments
+        str_detect(filepath, "HPRC-HG002.cur.20211005", negate = TRUE),
+        str_detect(
+            filepath,
+            "NIST_HG002_medical_genes_benchmark_v0.02",
+            negate = TRUE
+        ),
+        str_detect(filepath, "T2T-HG002-XY-v2.7", negate = TRUE),
+        ## Excluding unaligned bams from bam repo sheet
+        str_detect(filepath, "uBAMs", negate = TRUE),
+        ## Excluding flowcell level bams to reduce redundancy
+        str_detect(filepath, "basespace_45x_bams_vcfs_PerFlowCell", negate = TRUE),
+        ## Excluding alignments to prevent confusion and reduce redundancy
+        str_detect(
+            filepath,
+            "NA24694_Father_HiSeq100x_fastqs/NA24694_Justin-18411395",
+            negate = TRUE
+        ),
+        str_detect(
+            filepath,
+            "NA24695_Mother_HiSeq100x_fastqs/NA24695_Justin-18377364",
+            negate = TRUE
+        ),
+        str_detect(filepath, "CSHL_bwamem_bam_GRCh37", negate = TRUE),
+        str_detect(filepath, "MtSinai_blasr_bam_GRCh37", negate = TRUE),
+        str_detect(filepath, "Baylor_NGMLR_bam_GRCh37", negate = TRUE),
+        str_detect(
+            filename,
+            "HG002.SequelII.merged_15kb_20kb.GRCh37.duplomap.bam",
+            negate = TRUE
+        ),
+        str_detect(
+            filename,
+            "HG002.SequelII.merged_15kb_20kb.GRCh38.duplomap.bam",
+            negate = TRUE
+        ),
+        str_detect(filename, "HG005.GRCh38.haplotagged.bam", negate = TRUE),
+        str_detect(filename, "merged_ec_output_primary.bam", negate = TRUE),
+        ## TODO - Ask JZ to make sure these are redundant
+        str_detect(filepath, "HG003_250bp_All_good-29988042", negate = TRUE),
+        str_detect(filepath, "HG004_250bp_All-29933060", negate = TRUE),
+        ## TODO - Ask JZ about which 10X genomics to exclude, likely only include most recent high coverage run
+        ## Excluding bam subsets and subsampled bam - to prevent confusion and reduce redundancy
+        str_detect(filename, "HG002.GRCh38.300x_chr20.bam", negate = TRUE),
+        str_detect(filename, "HG002.GRCh38.60x.1.bam", negate = TRUE),
+        str_detect(filename, "HG002.hs37d5.300x_chr20.bam", negate = TRUE),
+        str_detect(filename, "HG002.hs37d5.60x.1.bam", negate = TRUE),
+        str_detect(filepath, "HG002Run01-11419412", negate = TRUE),
+        str_detect(filepath, "HG002Run02-11611685", negate = TRUE),
+        str_detect(filename, "HG003.GRCh38.60x.1.bam", negate = TRUE),
+        str_detect(filename, "HG003.hs37d5.60x.1.bam", negate = TRUE),
+        str_detect(filepath, "HG003Run01-13262252", negate = TRUE),
+        str_detect(filepath, "HG003Run03-13288282", negate = TRUE),
+        str_detect(filename, "HG004.GRCh38.60x.1.bam", negate = TRUE),
+        str_detect(filename, "HG004.hs37d5.60x.1.bam", negate = TRUE),
+        str_detect(filepath, "HG004Run01-15133132", negate = TRUE),
+        str_detect(filepath, "HG004run02-15332344", negate = TRUE),
+        str_detect(filename, "RMNISTHS_30xdownsample.bam", negate = TRUE),
+        ## Excluding unsorted bam - redundant compared to sorted bam
+        str_detect(filename, "HG002.mate_pair.bam", negate = TRUE),
+        str_detect(filename, "HG003.mate_pair.bam", negate = TRUE),
+        str_detect(filename, "HG004.mate_pair.bam", negate = TRUE),
+        str_detect(filename, "HG005.mate_pair.bam", negate = TRUE),
+        str_detect(filename, "HG006.mate_pair.bam", negate = TRUE),
+        str_detect(filename, "HG007.mate_pair.bam", negate = TRUE),
+        ## TODO - Ask JZ exclude ??HG002.SequelII.merged_15kb_20kb.GRCh37.duplomap.bam??
+        ## Excluding NIST UL minION bams from intermediate releases
+        str_detect(filepath, "guppy-V3.2.4_2020-01-22", negate = TRUE),
+        str_detect(filepath, "guppy-V2.3.4_2019-06-26", negate = TRUE),
+        str_detect(filepath, "combined_2018-08-10", negate = TRUE),
+        str_detect(filepath, "combined_2018-05-18", negate = TRUE),
+        ## Excluding methylation bams - will want to include metadata to help users clearly identify and use appropriately
+        str_detect(
+            filepath,
+            "HG003_NA24149_father/PacBio_CCS_15kb_20kb_chemistry2/GRCh38/GIAB_5mC_CpG",
+            negate = TRUE
+        ),
+        str_detect(
+            filepath,
+            "HG004_NA24143_mother/PacBio_CCS_15kb_20kb_chemistry2/GRCh38/GIAB_5mC_CpG",
+            negate = TRUE
+        ),
+        str_detect(
+            filepath,
+            "HG004_NA24143_mother/PacBio_CCS_15kb_20kb_chemistry2/hs37d5/GIAB_5mC_CpG",
+            negate = TRUE
+        ),
+        ## TODO - Ask JZ about which Chinese trio bams to include/ exclude, bams in individual HG005 - HG007 directories as well as under analysis
+        ## Only including one 10XGenomics dataset - at least for now
+        str_detect(
+            filepath,
+            "10XGenomics_ChromiumGenome_LongRanger2.0_06202016",
+            negate = TRUE
+        ),
+        str_detect(
+            filepath,
+            "10XGenomics_ChromiumGenome_LongRanger2.1_09302016",
+            negate = TRUE
+        ),
+        str_detect(filename, "LongRanger_phased_possorted", negate = TRUE),
+        str_detect(filename, "NA24385.GRCh37.phased_possorted_bam.bam", negate = TRUE),
+        str_detect(filename, "NA24143.GRCh38.phased_possorted_bam.bam", negate = TRUE),
+        str_detect(filename, "NA24149.GRCh38.phased_possorted_bam.bam", negate = TRUE),
+        str_detect(filename, "NA24385.GRCh37.phased_possorted_bam.bam", negate = TRUE),
+        str_detect(filename, "NA24385.GRCh38.phased_possorted_bam.bam", negate = TRUE),
+        str_detect(filename, "NA24385.GRCh37.phased_possorted_bam.bam", negate = TRUE),
+        str_detect(filename, "NA24385_phased_possorted_bam.bam", negate = TRUE),
+        str_detect(filepath, "HG003_NA24149_father/10XGenomics", negate = TRUE),
+        str_detect(filepath, "HG004_NA24143_mother/10XGenomics", negate = TRUE),
+        str_detect(
+            filepath,
+            "10XGenomics_ChromiumGenome_LongRanger2.1_06202017/GM24631_ChineseTrioFather_GRCh38",
+            negate = TRUE
+        ),
+        str_detect(
+            filepath,
+            "10XGenomics_ChromiumGenome_LongRanger2.1_06202017/GM24631_ChineseTrioMother_GRCh38",
+            negate = TRUE
+        ),
+        str_detect(
+            filepath,
+            "10XGenomics_ChromiumGenome_LongRanger2.1_06202017/GM24631_ChineseTrioSon_GRCh38",
+            negate = TRUE
+        ),
+        str_detect(
+            filepath,
+            "NA12878/10Xgenomics_ChromiumGenome_LongRanger2.0_06202016",
+            negate = TRUE
+        ),
+        str_detect(filepath, "10XGenomics/10XGenomics_sizeselected", negate = TRUE),
+        filepath != "/giab/ftp/data/NA12878/10XGenomics"
+    ) 
+glimpse(priority_bams)
+```
+
+Filtering of the full list of bams resulted in a list of 105 high priority bam files.
+
+### Adding Missing Information
+
+!!TODO - add code to update these specific fields!!
+
+HG003_10x_69x_RG_HP10xtrioRTG.bam, HG004_10x_71x_RG_HP10xtrioRTG.bam, GM24631_ChineseTrioSon_hg19_phased_possorted_bam.bam, GM24694_ChineseTrioFather_hg19_phased_possorted_bam.bam, GM24695_ChineseTrioMother_hg19_phased_possorted_bam.bam
+
+- missing giab_id, biosample, trio, and dna_id
+
+READMEs
+
+/giab/ftp/data/ChineseTrio/HG005_NA24631_son/NIST_Stanford_Illumina_6kb_matepair/bams/GRCh38 HG005.sorted.bam - https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/giab/data/ChineseTrio/HG005_NA24631_son/NIST_Stanford_Illumina_6kb_matepair/README.NIST_Stanford_Illumina_6kb_matepair
+
+/giab/ftp/data/AshkenazimTrio/HG004_NA24143_mother/NIST_Stanford_Illumina_6kb_matepair/bams/GRCh38 HG004.sorted.bam - https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/giab/data/AshkenazimTrio/HG004_NA24143_mother/NIST_Stanford_Illumina_6kb_matepair/README.NIST_Stanford_Illumina_6kb_matepair
+
+/giab/ftp/data/AshkenazimTrio/HG003_NA24149_father/NIST_Stanford_Illumina_6kb_matepair/bams/GRCh38 HG003.sorted.bam - https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/giab/data/AshkenazimTrio/HG003_NA24149_father/NIST_Stanford_Illumina_6kb_matepair/README.NIST_Stanford_Illumina_6kb_matepair
+
+/giab/ftp/data/AshkenazimTrio/HG002_NA24385_son/NIST_Stanford_Illumina_6kb_matepair/bams/GRCh38 HG002.sorted.bam - https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/giab/data/AshkenazimTrio/HG002_NA24385_son/NIST_Stanford_Illumina_6kb_matepair/README.NIST_Stanford_Illumina_6kb_matepair
+
+/giab/ftp/data/AshkenazimTrio/analysis/10XGenomics_ChromiumGenome_LongRanger2.2_Supernova2.0.1_04122018/GRCh37/NA24149_NA24143_10X_70X HG003_10x_69x_RG_HP10xtrioRTG.bam and HG004_10x_71x_RG_HP10xtrioRTG.bam -
+
+https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/giab/data/AshkenazimTrio/analysis/10XGenomics_ChromiumGenome_LongRanger2.2_Supernova2.0.1_04122018/GIAB_README.txt
+
+### Annotating with Metadata generated by SeqSleuth
+
+loading bam metadata generated by SeqSleuth
+
+```{r}
+bam_ss_df <- read_csv(here("raw-data/ss_full_metadata_tables/bam_metadata.csv"))
+```
+
+```{r}
+glimpse(bam_ss_df)
+```
+
+Sub-setting to priority bams for easier metadata extraction
+
+```{r}
+glimpse(priority_bams)
+```
+
+Changing `filename` to full file path instead of just the name of the file.
+```{r}
+priority_bams_join <- priority_bams %>%
+    mutate(
+        filename = glue::glue(
+            "{str_replace(filepath, '/giab/ftp','https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/giab')}/{filename}"
+        )
+    )
+```
+
+
+```{r}
+priority_bams_ss_df <- priority_bams_join %>% left_join(bam_ss_df)
+```
+
+```{r}
+glimpse(priority_bams_ss_df)
+```
+
+```{r}
+bam_ss_meta_json <- map(priority_bams_ss_df$metadata, fromJSON, flatten = TRUE)
+```
+
+Example structure of metadata entry.
+```{r}
+str(bam_ss_meta_json[45])
+```
+Extracting and reformatting metadata from metadata table generated using the SeqSleuth python package.
+```{r}
+meta_df <- tibble()
+for(i in bam_ss_meta_json){
+    filename = i$filename
+    hd_vn = i$metadata$header$HD$VN
+    hd_so = i$metadata$header$HD$SO 
+    ref = i$ref_genome
+    date = i$date
+    df = tibble(filename, hd_vn, hd_so, ref, date)
+    meta_df = bind_rows(meta_df, df)
+}
+
+```
+
+```{r}
+glimpse(meta_df)
+```
+
+```{r}
+pg_list <- lapply(bam_ss_meta_json, function(dat) {
+  # If the data frame is empty, return it as is
+    df <- dat$metadata$header$PG
+  if (is.null(df)) {
+    return(data.frame(PN = "0", ID = "0", VN = NA))
+  }
+
+  if ("PN" %in% names(df) && "VN" %in% names(df)) {
+    # If both PN and VN exist
+    df <- df[, c("PN", "VN"), drop = FALSE]
+  } else if (!("PN" %in% names(df)) && "ID" %in% names(df) && "VN" %in% names(df)) {
+    # Remove the random suffixes
+      df$ID <- gsub("-.*$", "", df$ID) 
+      df$ID <- gsub("\\..*$", "", df$ID) 
+
+    # If PN doesn't exist but ID exists
+    df <- df[, c("ID", "VN"), drop = FALSE]
+  } else if ("PN" %in% names(df) && "ID" %in% names(df) && "VN" %in% names(df)) {
+    # If both PN and ID exist
+    if (length(unique(df$PN)) <= length(unique(df$ID))) {
+      df <- df[, c("PN", "VN"), drop = FALSE]
+    } else {
+      # Remove the random suffixes
+      df$ID <- gsub("-.*$", "", df$ID) 
+      df$ID <- gsub("\\..*$", "", df$ID) 
+
+      df <- df[, c("ID", "VN"), drop = FALSE]
+    }
+  }
+  # Removing duplicates
+  df = unique(df)
+  return(df)
+})
+
+pg_df <- pg_list %>%
+    map_df(bind_rows, .id = "id") %>%
+    mutate(PN = if_else(is.na(PN), ID, PN)) %>%
+    filter(
+        PN != "ccs",
+        PN != "pbmerge",
+        PN != "longranger.lariat",
+        PN != "longranger.mark_duplicates",
+        PN != "longranger.attach_phasing"
+    ) %>%
+    group_by(id) %>%
+    slice_head(n = 1) %>%
+    ungroup() %>%
+    arrange(as.numeric(id)) %>%
+    select(-id, -ID)
+```
+
+```{r}
+priority_bams_metadata_df <- priority_bams_join %>% bind_cols(pg_df) %>% left_join(meta_df)
+```
+
+```{r}
+glimpse(priority_bams_metadata_df)
+```
+
+```{r}
+write_csv(priority_bams_metadata_df, "bam_metadata_20230915.csv")
+```
+
+## Conclusions
+
+Generated initial new version of the bam metadata table focusing on what I am considering the priority bams, these are the bam files users are or should be most interested in using. The key missing metadata fields are technology, coverage, and library characteristics. I manually added technology as well as adding the missing information noted above.
+
+# Session Information
+
+The following sections (in addition to the header) provide the **WHO** and **WHERE** for the analyses was performed.
+
+## System Information
+
+```{r}
+sessioninfo::platform_info()
+```
+
+## Package Versions
+
+```{r}
+sessioninfo::package_info() %>% 
+    filter(attached = TRUE) %>% 
+    select(package, loadedversion, date, source) %>%
+    knitr::kable(booktabs = TRUE, row.names = FALSE)
+```
