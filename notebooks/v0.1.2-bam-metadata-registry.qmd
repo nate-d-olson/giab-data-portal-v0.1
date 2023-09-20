@@ -1,9 +1,9 @@
 ---
-title: "BBD Human Genomics Analysis Template"
+title: "BAM metadata table for GIAB data registry v0.1.2"
 date: '`r Sys.Date()`'
-author: "Add your name here"
+author: "ND Olson"
 format: html
-editor: visual
+editor: source
 ---
 
 ```{r setup}
@@ -43,8 +43,7 @@ Generation of a complete and useable metadata table for bam files on the ftp sit
 
 ### Loading ftp metadata table from AWS CDK
 
-`giab_ftp_all_metadata.csv` metadata table for ftp site, obtained from s3 bucket, `s3://dev-giab-metadata-752334989853/raw/ftp/year=2023/month=5/giab_ftp_all_metadata.csv`, 
-  - MD5: `b0a67a70b809df539992c75c9d4eab71`
+`giab_ftp_all_metadata.csv` metadata table for ftp site, obtained from s3 bucket, `s3://dev-giab-metadata-752334989853/raw/ftp/year=2023/month=5/giab_ftp_all_metadata.csv`, - MD5: `b0a67a70b809df539992c75c9d4eab71`
 
 ```{r}
 ftp_metadata <- read_csv(here("raw-data/giab_ftp_all_metadata.csv"))
@@ -216,9 +215,172 @@ Filtering of the full list of bams resulted in a list of 105 high priority bam f
 
 !!TODO - add code to update these specific fields!!
 
-HG003_10x_69x_RG_HP10xtrioRTG.bam, HG004_10x_71x_RG_HP10xtrioRTG.bam, GM24631_ChineseTrioSon_hg19_phased_possorted_bam.bam, GM24694_ChineseTrioFather_hg19_phased_possorted_bam.bam, GM24695_ChineseTrioMother_hg19_phased_possorted_bam.bam
 
-- missing giab_id, biosample, trio, and dna_id
+
+Manually fixing missing giab_id, biosample, trio, and dna_id for the following files.
+
+- HG003_10x_69x_RG_HP10xtrioRTG.bam
+- HG004_10x_71x_RG_HP10xtrioRTG.bam
+- GM24631_ChineseTrioSon_hg19_phased_possorted_bam.bam 
+- GM24694_ChineseTrioFather_hg19_phased_possorted_bam.bam 
+- GM24695_ChineseTrioMother_hg19_phased_possorted_bam.bam
+
+
+```{r}
+priority_bams <- priority_bams %>%
+    mutate(
+        giab_id = if_else(
+            filename == "HG003_10x_69x_RG_HP10xtrioRTG.bam",
+            "HG003",
+            giab_id
+        ),
+        giab_id = if_else(
+            filename == "HG004_10x_71x_RG_HP10xtrioRTG.bam",
+            "HG004",
+            giab_id
+        ),
+        giab_id = if_else(
+            filename == "GM24631_ChineseTrioSon_hg19_phased_possorted_bam.bam",
+            "HG005",
+            giab_id
+        ),
+        giab_id = if_else(
+            filename == "GM24694_ChineseTrioFather_hg19_phased_possorted_bam.bam",
+            "HG006",
+            giab_id
+        ),
+        giab_id = if_else(
+            filename == "GM24695_ChineseTrioMother_hg19_phased_possorted_bam.bam",
+            "HG007",
+            giab_id
+        )
+    ) %>%
+    mutate(
+        biosample = if_else(
+            filename == "HG003_10x_69x_RG_HP10xtrioRTG.bam",
+            "SAMN03283345",
+            biosample
+        ),
+        biosample = if_else(
+            filename == "HG004_10x_71x_RG_HP10xtrioRTG.bam",
+            "SAMN03283346",
+            biosample
+        ),
+        biosample = if_else(
+            filename == "GM24631_ChineseTrioSon_hg19_phased_possorted_bam.bam",
+            "SAMN03283350",
+            biosample
+        ),
+        biosample = if_else(
+            filename == "GM24694_ChineseTrioFather_hg19_phased_possorted_bam.bam",
+            "SAMN03283348",
+            biosample
+        ),
+        biosample = if_else(
+            filename == "GM24695_ChineseTrioMother_hg19_phased_possorted_bam.bam",
+            "SAMN03283349",
+            biosample
+        )
+    ) %>%
+    mutate(
+        trio = if_else(
+            filename == "HG003_10x_69x_RG_HP10xtrioRTG.bam",
+            "ASHKENAZI_JEWISH",
+            trio
+        ),
+        trio = if_else(
+            filename == "HG004_10x_71x_RG_HP10xtrioRTG.bam",
+            "ASHKENAZI_JEWISH",
+            trio
+        ),
+        trio = if_else(
+            filename == "GM24631_ChineseTrioSon_hg19_phased_possorted_bam.bam",
+            "HAN_CHINESE",
+            trio
+        ),
+        trio = if_else(
+            filename == "GM24694_ChineseTrioFather_hg19_phased_possorted_bam.bam",
+            "HAN_CHINESE",
+            trio
+        ),
+        trio = if_else(
+            filename == "GM24695_ChineseTrioMother_hg19_phased_possorted_bam.bam",
+            "HAN_CHINESE",
+            trio
+        )
+    ) %>% 
+        mutate(
+        dna_id = if_else(
+            filename == "HG003_10x_69x_RG_HP10xtrioRTG.bam",
+            "NA24149",
+            dna_id
+        ),
+        dna_id = if_else(
+            filename == "HG004_10x_71x_RG_HP10xtrioRTG.bam",
+            "NA24143",
+            dna_id
+        ),
+        dna_id = if_else(
+            filename == "GM24631_ChineseTrioSon_hg19_phased_possorted_bam.bam",
+            "NA24631",
+            dna_id
+        ),
+        dna_id = if_else(
+            filename == "GM24694_ChineseTrioFather_hg19_phased_possorted_bam.bam",
+            "NA24694",
+            dna_id
+        ),
+        dna_id = if_else(
+            filename == "GM24695_ChineseTrioMother_hg19_phased_possorted_bam.bam",
+            "NA24695",
+            dna_id
+        )
+    ) %>% 
+    mutate(
+        readme = if_else(
+            filepath == "79460bb8ff3e50ec1d3ea64ec36e4c50",
+            "https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/giab/data/ChineseTrio/HG005_NA24631_son/NIST_Stanford_Illumina_6kb_matepair/README.NIST_Stanford_Illumina_6kb_matepair",
+            readme
+        ),
+        readme = if_else(
+            filepath == "a8632a504bd57c88e7e37c8c0eeb17c1",
+            "https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/giab/data/ChineseTrio/HG005_NA24631_son/NIST_Stanford_Illumina_6kb_matepair/README.NIST_Stanford_Illumina_6kb_matepair",
+            readme
+        ),        	
+
+        readme = if_else(
+            md5key == "79547e2ce78792e9e2d7e49aa7ac2bfe",
+            "https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/giab/data/AshkenazimTrio/HG004_NA24143_mother/NIST_Stanford_Illumina_6kb_matepair/README.NIST_Stanford_Illumina_6kb_matepair",
+            readme
+        ),
+        readme = if_else(
+            md5key == '50ce252b85546d1b2c2f0382e77f3edb',
+            "https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/giab/data/AshkenazimTrio/HG003_NA24149_father/NIST_Stanford_Illumina_6kb_matepair/README.NIST_Stanford_Illumina_6kb_matepair",
+            readme
+        ),
+        readme = if_else(
+            filepath == "/giab/ftp/data/AshkenazimTrio/HG002_NA24385_son/NIST_Stanford_Illumina_6kb_matepair/bams/GRCh38" &
+                filename == "HG002.sorted.bam",
+            "https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/giab/data/AshkenazimTrio/HG002_NA24385_son/NIST_Stanford_Illumina_6kb_matepair/README.NIST_Stanford_Illumina_6kb_matepair",
+            readme
+        ),
+        readme = if_else(
+            md5key == "f5b161169b01da488f301d2b952392f7",
+            "https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/giab/data/AshkenazimTrio/analysis/10XGenomics_ChromiumGenome_LongRanger2.2_Supernova2.0.1_04122018/GIAB_README.txt",
+            readme
+        ),
+        readme = if_else(
+            md5key == "51035caed5cb67794d91e879a8bd437d",
+            "https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/giab/data/AshkenazimTrio/analysis/10XGenomics_ChromiumGenome_LongRanger2.2_Supernova2.0.1_04122018/GIAB_README.txt",
+            readme
+        ),
+        readme = if_else(
+            md5key == "cec5d0313b769701ed31f25f4b8cbcf1",
+            "https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/giab/data/AshkenazimTrio/analysis/10XGenomics_ChromiumGenome_LongRanger2.2_Supernova2.0.1_04122018/GIAB_README.txt",
+            readme
+        ),
+    )
+```
 
 READMEs
 
@@ -253,6 +415,7 @@ glimpse(priority_bams)
 ```
 
 Changing `filename` to full file path instead of just the name of the file.
+
 ```{r}
 priority_bams_join <- priority_bams %>%
     mutate(
@@ -261,7 +424,6 @@ priority_bams_join <- priority_bams %>%
         )
     )
 ```
-
 
 ```{r}
 priority_bams_ss_df <- priority_bams_join %>% left_join(bam_ss_df)
@@ -276,10 +438,13 @@ bam_ss_meta_json <- map(priority_bams_ss_df$metadata, fromJSON, flatten = TRUE)
 ```
 
 Example structure of metadata entry.
+
 ```{r}
 str(bam_ss_meta_json[45])
 ```
+
 Extracting and reformatting metadata from metadata table generated using the SeqSleuth python package.
+
 ```{r}
 meta_df <- tibble()
 for(i in bam_ss_meta_json){
@@ -358,8 +523,39 @@ priority_bams_metadata_df <- priority_bams_join %>% bind_cols(pg_df) %>% left_jo
 glimpse(priority_bams_metadata_df)
 ```
 
+
+### Adding Seq Tech
 ```{r}
-write_csv(priority_bams_metadata_df, "bam_metadata_20230915.csv")
+priority_bams_metadata_df <- priority_bams %>% 
+    mutate(technology = case_when(
+        str_detect(filepath, "10XGenomics|10Xgenomics") ~ "10XGenomics",
+        str_detect(filepath, "Illumina|HiSeq") ~ "ILLUMINA",
+        str_detect(filepath, "PacBio") ~ "PACBIO",
+        str_detect(filepath, "OxfordNanopore") ~ "ONT",
+        str_detect(filepath, "BGI") ~ "BGI",
+        TRUE ~ "Undetermined"
+    ))
+```
+
+
+
+
+### Writing to file
+
+Cleaning up table for posting on github
+```{r}
+glimpse(priority_bams_metadata_df)
+```
+```{r}
+bam_registry_tbl <- priority_bams_metadata_df %>% 
+    select(giab_id, trio, technology, filesize, filepath, filename, indexfile, readme) %>% 
+    mutate(filepath = str_replace(filepath, '/giab/ftp', 'https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/giab'),
+           readme = str_replace(readme, '/giab/ftp', 'https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/giab'))
+```
+
+
+```{r}
+write_csv(bam_registry_tbl, "bam_metadata_20230920.csv")
 ```
 
 ## Conclusions
