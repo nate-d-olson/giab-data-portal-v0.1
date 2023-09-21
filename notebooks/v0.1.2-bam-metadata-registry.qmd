@@ -15,6 +15,12 @@ library(jsonlite)
 library(data.table)
 ```
 
+## Issues to address
+
+- Is there a better way to obtain/ get more consistently formatted dates?
+- Better way to get version of reference genome used, primarily getting from filename and path
+- See comments in the code chunk for filtering full list of bams to list of priority bams
+
 # Summary
 
 Generating new version of the metadata table for the giab data registry. This bam metadata table will focus on priority datasets, manually excluding subsets of larger datasets and bam files generated using multiple mapping methods.
@@ -48,13 +54,19 @@ Generation of a complete and useable metadata table for bam files on the ftp sit
 ```{r}
 ftp_metadata <- read_csv(here("raw-data/giab_ftp_all_metadata.csv"))
 glimpse(ftp_metadata)
-
 ```
 
 Number of bam files on the ftp site. A number of these are for old technologies, redundant relative to other bam files, or were generated for specific analyses and not of interest to most users.
 
 ```{r}
 ftp_metadata %>% filter(filetype == "bam") %>% nrow()
+```
+
+
+Bam stats from CDK pipeline
+```{r}
+bamstats_cdk_df <- read_csv(here("raw-data/bamstats.csv"))
+glimpse(bamstats_cdk_df)
 ```
 
 ### Generating List of High Priority Bam Files
@@ -210,6 +222,13 @@ glimpse(priority_bams)
 ```
 
 Filtering of the full list of bams resulted in a list of 105 high priority bam files.
+
+Adding bamstats to priority_bams
+```{r}
+priority_bams <- priority_bams %>% 
+    left_join(bamstats_cdk_df)
+glimpse(priority_bams)
+```
 
 ### Adding Missing Information
 
@@ -410,9 +429,6 @@ glimpse(bam_ss_df)
 
 Sub-setting to priority bams for easier metadata extraction
 
-```{r}
-glimpse(priority_bams)
-```
 
 Changing `filename` to full file path instead of just the name of the file.
 
@@ -515,6 +531,9 @@ pg_df <- pg_list %>%
     select(-id, -ID)
 ```
 
+
+
+### Combining metadata tables
 ```{r}
 priority_bams_metadata_df <- priority_bams_join %>% bind_cols(pg_df) %>% left_join(meta_df)
 ```
@@ -522,11 +541,29 @@ priority_bams_metadata_df <- priority_bams_join %>% bind_cols(pg_df) %>% left_jo
 ```{r}
 glimpse(priority_bams_metadata_df)
 ```
+### Cleaning up reference genome
+```{r}
+priority_bams_metadata_df <- priority_bams_metadata_df %>% 
+    mutate(ref = case_when(is.na(ref) & !is.na(reference_genome) ~ reference_genome,
+                           str_detect(filename, "GRCh38") ~ "GRCh38",
+                           str_detect(filename, "GRCh37") ~ "GRCh37",
+                           str_detect(filename, "hs37d5") ~ "hs37d5",
+                           str_detect(filename, "chm13") ~ "CHM13", ## TODO will want to get version number
+                           ## Hard coding references for files where reference is not indicated from the file path
+                           # 6kb jump libraries
+                           md5key == "f9376aa42d6e1362c6a52a74b83c8c92" ~ "GRCh37",
+                           md5key == "5b8bf1cd5771689f8ebef8c428146b68" ~ "GRCh37",
+                           md5key == "eff61acfb5863d6ff9897ef6953bfb9c" ~ "GRCh37",
+                           md5key == "24a5f27ffb7ef46eb555517f21934436" ~ "GRCh37",
+                           md5key == "1a2a69775e01a26d8618ab34432ba08e" ~ "GRCh37",
+                           md5key == "f4e765afa04d4d4390cc20cc1ee69b69" ~ "GRCh37",
+                           TRUE ~ ref))
+```
 
 
 ### Adding Seq Tech
 ```{r}
-priority_bams_metadata_df <- priority_bams %>% 
+priority_bams_metadata_df <- priority_bams_metadata_df %>% 
     mutate(technology = case_when(
         str_detect(filepath, "10XGenomics|10Xgenomics") ~ "10XGenomics",
         str_detect(filepath, "Illumina|HiSeq") ~ "ILLUMINA",
@@ -547,15 +584,39 @@ Cleaning up table for posting on github
 glimpse(priority_bams_metadata_df)
 ```
 ```{r}
-bam_registry_tbl <- priority_bams_metadata_df %>% 
-    select(giab_id, trio, technology, filesize, filepath, filename, indexfile, readme) %>% 
-    mutate(filepath = str_replace(filepath, '/giab/ftp', 'https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/giab'),
-           readme = str_replace(readme, '/giab/ftp', 'https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/giab'))
+bam_registry_tbl <- priority_bams_metadata_df %>%
+    select(
+        giab_id,
+        trio,
+        technology,
+        ref,
+        PN,
+        VN,
+        hd_vn,
+        hd_so,
+        filesize,
+        filepath,
+        filename,
+        indexfile,
+        readme
+    ) %>%
+    mutate(
+        filepath = str_replace(
+            filepath,
+            '/giab/ftp',
+            'https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/giab'
+        ),
+        readme = str_replace(
+            readme,
+            '/giab/ftp',
+            'https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/giab'
+        )
+    )
 ```
 
 
 ```{r}
-write_csv(bam_registry_tbl, "bam_metadata_20230920.csv")
+write_csv(bam_registry_tbl, "bam_metadata_20230921.csv")
 ```
 
 ## Conclusions
