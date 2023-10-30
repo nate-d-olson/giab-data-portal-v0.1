@@ -216,10 +216,15 @@ priority_bams <- ftp_metadata %>%
             negate = TRUE
         ),
         str_detect(filepath, "10XGenomics/10XGenomics_sizeselected", negate = TRUE),
-        filepath != "/giab/ftp/data/NA12878/10XGenomics"
+        filepath != "/giab/ftp/data/NA12878/10XGenomics",
+        ## Excluding PacBio CLR
+        str_detect(filepath, "PacBio_MtSinai_NIST", negate = TRUE),
+        ## Excluding older BGISEQ
+        str_detect(filepath, "BGISEQ500", negate = TRUE)
     ) 
 glimpse(priority_bams)
 ```
+
 
 Filtering of the full list of bams resulted in a list of 105 high priority bam files.
 
@@ -575,6 +580,12 @@ priority_bams_metadata_df <- priority_bams_metadata_df %>%
 ```
 
 
+### Coverage estimate
+```{r}
+priority_bams_metadata_df <- priority_bams_metadata_df %>% 
+    mutate(coverage_estimate = round(filesize / 3, 0))
+```
+
 
 
 ### Writing to file
@@ -590,10 +601,10 @@ bam_registry_tbl <- priority_bams_metadata_df %>%
         trio,
         technology,
         ref,
+        coverage_estimate,
         PN,
         VN,
         hd_vn,
-        hd_so,
         filesize,
         filepath,
         filename,
@@ -616,7 +627,7 @@ bam_registry_tbl <- priority_bams_metadata_df %>%
 
 
 ```{r}
-write_csv(bam_registry_tbl, "bam_metadata_20230921.csv")
+write_csv(bam_registry_tbl, "bam_metadata_20231030.csv")
 ```
 
 ## Conclusions

@@ -4,6 +4,7 @@
 | trio | string | Trio information |
 | technology | string | Sequencing technology used |
 | ref | string | Reference genome used |
+| coverage_estimate | integer | estimated coverage based on file size (filesize_in_Gb/3)|
 | PN | string | Name or description of the program used to generate the bam |
 | VN | string | Version number of the program used to generate the bam |
 | hd_vn | string | bam file format version number |
@@ -13,3 +14,5 @@
 | filename | string | url for file |
 | indexfile | string | Name of the index file |
 | readme | string | Path or description for the readme file |
+
+
