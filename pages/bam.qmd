@@ -1,0 +1,18 @@
+---
+title: "BAM Metadata"
+format: html
+---
+
+```{r}
+#| message: false
+library(tidyverse)
+path <- "data/derived/bam.csv"
+if (file.exists(path)) {
+  df <- readr::read_csv(path, show_col_types = FALSE)
+  df %>% select(giab_id, file_url, filesize_gb, ref_genome, sort_order, aligner) %>%
+    head(50) %>% knitr::kable()
+} else {
+  cat("Derived BAM table not found. Run scripts/01_ingest.R, 02_transform.R first.")
+}
+```
+

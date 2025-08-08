@@ -1,0 +1,18 @@
+---
+title: "VCF Metadata"
+format: html
+---
+
+```{r}
+#| message: false
+library(tidyverse)
+path <- "data/derived/vcf.csv"
+if (file.exists(path)) {
+  df <- readr::read_csv(path, show_col_types = FALSE)
+  df %>% select(giab_id, file_url, filesize_gb, ref_genome, tech, snps, indels, passed_filters) %>%
+    head(50) %>% knitr::kable()
+} else {
+  cat("Derived VCF table not found. Run scripts/01_ingest.R, 02_transform.R first.")
+}
+```
+

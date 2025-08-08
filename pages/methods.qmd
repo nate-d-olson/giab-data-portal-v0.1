@@ -1,0 +1,21 @@
+---
+title: "Methods"
+format: html
+---
+
+ETL pipeline (Phase 1):
+
+1) scripts/01_ingest.R reads raw-data/ CSV/JSON and manually generated tables into RDS bundles.
+2) scripts/02_transform.R harmonizes into a canonical schema and writes data/derived/*.csv.
+3) scripts/03_validate.R runs basic checks and writes data/derived/validation_report.md.
+
+Render the site after ETL:
+
+```bash
+R -q -e 'renv::restore()'
+R -q -e 'source("scripts/01_ingest.R"); source("scripts/02_transform.R"); source("scripts/03_validate.R")'
+quarto render
+```
+
+For publishing with GitHub Pages, configure the repository to serve the docs/ directory from the main branch.
+

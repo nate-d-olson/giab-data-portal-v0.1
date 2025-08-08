@@ -1,0 +1,13 @@
+---
+title: "Data Dictionaries"
+format: html
+---
+
+Core data dictionary files:
+
+- metadata_tables/fastq_metadata.data_dict.md
+- metadata_tables/bam_metadata_data_dictionary.md
+- metadata_tables/vcf_metadata.data_dictionary.md
+
+Refer to the above in-repo files for detailed field descriptions. The portal’s canonical schema is documented at data/schema/files_schema.md.
+

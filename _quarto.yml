@@ -1,0 +1,25 @@
+project:
+  type: website
+  output-dir: docs
+
+website:
+  title: "GIAB Data Portal (MVP)"
+  navbar:
+    left:
+      - text: Overview
+        href: index.qmd
+      - text: FASTQ
+        href: pages/fastq.qmd
+      - text: BAM
+        href: pages/bam.qmd
+      - text: VCF
+        href: pages/vcf.qmd
+      - text: Dictionaries
+        href: pages/dictionaries.qmd
+      - text: Methods
+        href: pages/methods.qmd
+
+format:
+  html:
+    theme: cosmo
+    toc: true

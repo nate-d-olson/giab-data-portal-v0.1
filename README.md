@@ -13,3 +13,58 @@ For the three file types metadata was initially extracted from the filenames.
 The metadata were enriched by extracting additional metadata from the file contents,
 including parsing metadata from sequencing read names (fastq and bam [WIP]) along with metadata from file headers (bams and vcf). 
 Summary statistics were calculated using fastqc (for fastqs), samtools stats (for bams), and rtgtools vcfstats (for vcfs).
+
+## Develop, Run, and Test Locally
+
+Prerequisites
+- R (4.x) and Quarto installed locally
+- Recommended: RStudio
+
+Setup
+- R -q -e 'renv::restore()'
+
+Run ETL and render site
+- R -q -e 'source("scripts/01_ingest.R"); source("scripts/02_transform.R"); source("scripts/03_validate.R")'
+- quarto render
+- Open docs/index.html
+
+Makefile (optional shortcuts)
+- make etl     # runs the ETL pipeline
+- make render  # renders Quarto to docs/
+- make site    # etl + render
+
+Project structure essentials
+- raw-data/: input CSV/JSON/TSV
+- scripts/: ETL scripts (01_ingest.R, 02_transform.R, 03_validate.R)
+- data/derived/: ETL outputs and validation report
+- docs/: rendered Quarto site
+
+## Branching and Contribution Workflow
+
+We use a lightweight gitflow approach:
+- main: production (auto-deploys to GitHub Pages)
+- develop: integration branch for next release
+- feature/*: short-lived branches targeting develop (e.g., feature/schema-v2)
+- release/* and hotfix/* as needed
+
+Submitting changes
+- Branch from develop (or feature/), open a PR to develop with a clear summary, data impact, and screenshots of the rendered pages if applicable.
+- Once validated, merge develop -> main to publish.
+
+## CI/CD and Dev Previews
+
+Production deploy (on push to main)
+- GitHub Actions builds ETL outputs, renders the site, and deploys to GitHub Pages from docs/.
+
+Dev preview (PRs and manual runs)
+- On pull_request to main or develop and on workflow_dispatch, CI runs ETL + render and:
+  - Uploads the rendered site as a build artifact for download.
+  - Publishes a Pages preview URL when available (Actions deploy-pages preview).
+
+Run CI locally
+- Install act (https://github.com/nektos/act)
+- act -j build-dev           # run the dev workflow locally
+- act -j deploy-pages -e event.json  # simulate main push (requires configuration)
+
+Notes
+- Secrets for external integrations (AWS, Google) are not needed for Phase 1; later phases will use repo secrets in CI.

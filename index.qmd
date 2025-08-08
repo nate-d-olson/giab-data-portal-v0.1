@@ -1,0 +1,22 @@
+---
+title: "GIAB Data Portal (MVP)"
+format: html
+---
+
+```{r}
+#| message: false
+library(tidyverse)
+exists_csv <- function(x) file.exists(x)
+fastq <- if (exists_csv("data/derived/fastq.csv")) readr::read_csv("data/derived/fastq.csv", show_col_types = FALSE) else NULL
+bam   <- if (exists_csv("data/derived/bam.csv"))   readr::read_csv("data/derived/bam.csv",   show_col_types = FALSE) else NULL
+vcf   <- if (exists_csv("data/derived/vcf.csv"))   readr::read_csv("data/derived/vcf.csv",   show_col_types = FALSE) else NULL
+
+summary_tbl <- tibble(
+  table = c("FASTQ","BAM","VCF"),
+  rows  = c(nrow(fastq %||% tibble()), nrow(bam %||% tibble()), nrow(vcf %||% tibble()))
+)
+knitr::kable(summary_tbl)
+```
+
+This MVP site is built from data in data/derived/ produced by scripts in scripts/.
+
